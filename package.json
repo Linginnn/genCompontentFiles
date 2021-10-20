@@ -2,7 +2,7 @@
   "name": "gen-compontent-file",
   "displayName": "gen-compontent-file",
   "description": "",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "Lingin",
   "engines": {
     "vscode": "^1.61.0"
