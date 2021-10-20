@@ -12,14 +12,27 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:gen-compontent-file.genCompontent"
+    "onCommand:gen-compontent-file.genCompontent",
+    "onCommand:gen-compontent-file.genComment"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "gen-compontent-file.genCompontent",
-        "title": "生成组件模版文件夹"
+        "title": "生成MC组件模版文件夹"
+      },
+      {
+        "command": "gen-compontent-file.genComment",
+        "title": "生成MC组件注释"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "gen-compontent-file.genComment",
+        "key": "ctrl+i",
+        "mac": "command+i",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {
@@ -28,6 +41,13 @@
           "command": "gen-compontent-file.genCompontent",
           "group": "1_modification",
           "when": "explorerResourceIsFolder"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "gen-compontent-file.genComment",
+          "group": "1_modification",
+          "when": "editorFocus"
         }
       ]
     }
