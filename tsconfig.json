@@ -16,7 +16,8 @@
 	},
 	"exclude": [
 		"node_modules",
-		"public",
+		"src/tpls",
+		"out",
 		".vscode-test"
 	]
 }

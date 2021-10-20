@@ -16,13 +16,12 @@ export function activate(context: vscode.ExtensionContext) {
         .showInputBox({
           placeHolder: "请输入组件名", // 在输入框内的提示信息
           prompt: "输入组件名字，首字母大写", // 在输入框下方的提示信息
+          validateInput: (text) => {
+            return text;
+          },
         })
         .then(function (msg) {
-          util.copyFile(
-            `${path.join(__dirname, "../")}public`,
-            uri.fsPath,
-            msg ?? "Compontent"
-          );
+          util.copyFile(`${__dirname}/tpls`, uri.fsPath, msg ?? "Compontent");
         });
     }
   );
