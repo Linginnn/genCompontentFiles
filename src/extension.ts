@@ -17,10 +17,13 @@ export function activate(context: vscode.ExtensionContext) {
           placeHolder: "请输入组件名", // 在输入框内的提示信息
           prompt: "输入组件名字，首字母大写", // 在输入框下方的提示信息
           validateInput: (text) => {
-            return text;
+            if (/\b([a-z])/.test(text)) {
+              return;
+            }
+            return "输入组件名字，首字母大写";
           },
         })
-        .then(function (msg) {
+        .then((msg) => {
           util.copyFile(`${__dirname}/tpls`, uri.fsPath, msg ?? "Compontent");
         });
     }
