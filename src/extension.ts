@@ -38,7 +38,6 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.activeTextEditor?.selection.active.line || 1,
           vscode.window.activeTextEditor?.selection.active.character || 1
         );
-        console.log(position);
         //在光标位置插入字符串
         editBuilder.insert(position, "width:...");
       });
