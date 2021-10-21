@@ -8,7 +8,9 @@
 安装依赖
 ``` 
 yarn
+yarn  watch
 ```
+- 如果报错先 ```yarn copy``` 一下
 
 * F5进行调试
 
