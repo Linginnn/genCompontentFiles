@@ -2,17 +2,17 @@ import React from "react";
 
 export interface ItplProps {
   /**
-   * @description
-   * @description.zh-CN
-   * @type
    * @required true
+   * @description.en-US
+   * @description.zh-CN
+   * @type  id
    */
   id: number;
 }
 const tpl: React.FC<ItplProps> = (props) => {
-  /**state部分**/
+  /**state**/
 
-  /**effect部分**/
+  /**effect**/
 
   /**methods**/
 

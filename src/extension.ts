@@ -5,6 +5,16 @@ import * as util from "./util";
 import { Position } from "vscode";
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
+
+const tpl = (type: string | undefined) => `
+  /**
+   * @required 
+   * @description.zh-CN
+   * @description.en-US
+   * @type
+   */
+  ${type}:`;
+
 export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
@@ -32,15 +42,22 @@ export function activate(context: vscode.ExtensionContext) {
   const genComment = vscode.commands.registerCommand(
     "gen-compontent-file.genComment",
     () => {
-      vscode.window.activeTextEditor?.edit((editBuilder) => {
-        //获取光标位置
-        const position = new Position(
-          vscode.window.activeTextEditor?.selection.active.line || 1,
-          vscode.window.activeTextEditor?.selection.active.character || 1
-        );
-        //在光标位置插入字符串
-        editBuilder.insert(position, "width:...");
-      });
+      //在光标位置插入字符串
+      const msg = vscode.window
+        .showInputBox({
+          placeHolder: "请输入属性", // 在输入框内的提示信息
+          prompt: "请输入属性", // 在输入框下方的提示信息
+        })
+        .then((msg) => {
+          vscode.window.activeTextEditor?.edit((editBuilder) => {
+            //获取光标位置
+            const position = new Position(
+              vscode.window.activeTextEditor?.selection.active.line || 1,
+              vscode.window.activeTextEditor?.selection.active.character || 1
+            );
+            editBuilder.insert(position, tpl(msg));
+          });
+        });
     }
   );
   context.subscriptions.push(genComment);
