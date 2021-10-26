@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import * as util from "./util";
 import * as comment from "./tpls/comment";
 import { Position } from "vscode";
+import path = require("path");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -31,11 +32,39 @@ export function activate(context: vscode.ExtensionContext) {
             if (/^[A-Z][A-z0-9]*$/.test(text)) {
               return;
             }
+            if (!text) {
+              return "组件名字为必填";
+            }
             return "输入组件名字，首字母大写";
           },
         })
         .then((msg) => {
-          util.copyFile(`${__dirname}/tpls`, uri.fsPath, msg ?? "Compontent");
+          const repeat = util.getFileRepeat(uri.fsPath, msg ?? "Compontent");
+          const gen = () => {
+            if (!msg) {
+              return;
+            }
+            util.genFiles(path.join(__dirname, "tpls/tpl"), uri.fsPath, msg);
+            util.genLocalesDir(uri.fsPath, msg);
+            setTimeout(() => {
+              vscode.window.showInformationMessage(`生成${msg}文件夹成功`);
+            }, 10);
+          };
+          if (repeat) {
+            vscode.window
+              .showInformationMessage(
+                `${msg}组件已存在,是否继续创建`,
+                { modal: true },
+                "是"
+              )
+              .then((pick) => {
+                if (pick === "是") {
+                  gen();
+                }
+              });
+          } else {
+            gen();
+          }
         });
     }
   );

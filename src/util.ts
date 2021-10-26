@@ -1,47 +1,107 @@
-const fs = require("fs");
+import path = require("path");
 
-export const copyFile = function (src: string, dst: string, targtName: string) {
+const fs = require("fs");
+const LOCALES = "mdLocales";
+
+export const genFiles = function (
+  src: string,
+  dst: string,
+  targtName: string,
+  endWith: string = "tpl"
+) {
+  try {
+    const targetPath = path.join(dst, targtName);
+    fs.mkdirSync(targetPath);
+    copyFile(src, targetPath, targtName, endWith);
+  } catch (error) {
+    return error;
+  }
+};
+
+export const copyFile = function (
+  src: string,
+  dst: string,
+  targtName: string,
+  endWith: string = "tpl"
+) {
   let paths: [] = fs.readdirSync(src); //同步读取当前目录
   paths
-    .filter((item: string) => !item.includes(".js"))
-    .forEach(function (path: string) {
-      const _src = src + "/" + path;
-      let finalPath = path;
-      if (path.includes("test")) {
-        finalPath = path.replace("tpl", targtName.toLocaleLowerCase());
-      } else if (path.includes("tpl")) {
-        finalPath = path.replace("tpl", targtName);
+    .filter((item: string) => {
+      return !item.includes(".js");
+    })
+    .forEach(function (itemPath: string) {
+      const _src = path.join(src, itemPath);
+      const lowTargtName = targtName.toLocaleLowerCase();
+      let finalPath = itemPath;
+      if (itemPath.includes(".test")) {
+        finalPath = itemPath.replace(endWith, lowTargtName);
+        // 排除md文件和 替换模版字符串
+      } else if (itemPath.includes(endWith) && !itemPath.includes(".md")) {
+        finalPath = itemPath.replace(endWith, lowTargtName);
       }
-      const _dst = dst + "/" + finalPath;
+      const _dst = path.join(dst, finalPath);
       fs.stat(_src, function (err: any, stats: any) {
         //stats  该对象 包含文件属性
         if (err) {
-          throw err;
+          return err;
         }
         if (stats.isFile()) {
           //如果是个文件则拷贝
           const data = fs.readFileSync(_src, "utf-8");
-          const finalData = data.replaceAll("tpl", targtName);
+          const finalData = data.replaceAll(
+            endWith,
+            itemPath.includes(".less") ? lowTargtName : targtName
+          );
           fs.writeFileSync(_dst, finalData);
         } else if (stats.isDirectory()) {
-          //是目录则 递归
-          checkDirectory(_src, _dst, targtName, copyFile);
+          //是目录则
+          fs.mkdirSync(_dst);
+          copyFile(_src, _dst, targtName);
+          // checkDirectory(_src, _dst, targtName, copyFile);
         }
       });
     });
 };
-const checkDirectory = function (
-  src: string,
-  dst: string,
-  targtName: string,
-  callback: (src: string, dst: string, targtName: string) => void
-) {
-  fs.access(dst, fs.constants.F_OK, (err: any) => {
-    if (err) {
-      fs.mkdirSync(dst);
-      callback(src, dst, targtName);
-    } else {
-      callback(src, dst, targtName);
-    }
-  });
+// const checkDirectory = function (
+//   src: string,
+//   dst: string,
+//   targtName: string,
+//   callback: (src: string, dst: string, targtName: string) => void
+// ) {
+//   fs.access(dst, fs.constants.F_OK, (err: any) => {
+//     if (err) {
+//       // fs.mkdirSync(dst);
+//       callback(src, dst, targtName);
+//     } else {
+//       callback(src, dst, targtName);
+//     }
+//   });
+// };
+
+export const genLocalesDir = function (fsPath: string, name: string) {
+  const lowName = name.toLocaleLowerCase();
+  try {
+    const data: string = fs.readFileSync(
+      path.join(__dirname, "/tpls/locale.ts"),
+      "utf-8"
+    );
+    fs.mkdir(path.join(fsPath, "../", LOCALES, lowName), (err: any) => {
+      if (err) {
+        return err;
+      }
+      ["zh-CN", "en-US"].forEach((item) => {
+        fs.writeFileSync(
+          path.join(fsPath, "../", LOCALES, lowName, `${item}.ts`),
+          data.replace("locale", lowName)
+        );
+      });
+    });
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getFileRepeat = function (fsPath: string, name: string) {
+  let paths: [] = fs.readdirSync(fsPath); //同步读取当前目录
+  return !!paths.find((item) => item === name);
 };
