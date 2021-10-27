@@ -36,8 +36,8 @@ export const copyFile = function (
       if (itemPath.includes(".test")) {
         finalPath = itemPath.replace(endWith, lowTargtName);
         // 排除md文件和 替换模版字符串
-      } else if (itemPath.includes(endWith) && !itemPath.includes(".md")) {
-        finalPath = itemPath.replace(endWith, lowTargtName);
+        // } else if (itemPath.includes(endWith) && !itemPath.includes(".md")) {
+        //   finalPath = itemPath.replace(endWith, lowTargtName);
       }
       const _dst = path.join(dst, finalPath);
       fs.stat(_src, function (err: any, stats: any) {
@@ -48,35 +48,27 @@ export const copyFile = function (
         if (stats.isFile()) {
           //如果是个文件则拷贝
           const data = fs.readFileSync(_src, "utf-8");
-          const finalData = data.replaceAll(
-            endWith,
-            itemPath.includes(".less") ? lowTargtName : targtName
-          );
+          let finalData = "";
+          if (itemPath.includes("tpl.md")) {
+            finalData = data
+              .replaceAll(endWith, lowTargtName)
+              .replaceAll("Bpl", targtName);
+          } else {
+            finalData = data.replaceAll(
+              endWith,
+              itemPath.includes(".less") ? lowTargtName : targtName
+            );
+          }
+
           fs.writeFileSync(_dst, finalData);
         } else if (stats.isDirectory()) {
           //是目录则
           fs.mkdirSync(_dst);
           copyFile(_src, _dst, targtName);
-          // checkDirectory(_src, _dst, targtName, copyFile);
         }
       });
     });
 };
-// const checkDirectory = function (
-//   src: string,
-//   dst: string,
-//   targtName: string,
-//   callback: (src: string, dst: string, targtName: string) => void
-// ) {
-//   fs.access(dst, fs.constants.F_OK, (err: any) => {
-//     if (err) {
-//       // fs.mkdirSync(dst);
-//       callback(src, dst, targtName);
-//     } else {
-//       callback(src, dst, targtName);
-//     }
-//   });
-// };
 
 export const genLocalesDir = function (fsPath: string, name: string) {
   const lowName = name.toLocaleLowerCase();
@@ -96,6 +88,28 @@ export const genLocalesDir = function (fsPath: string, name: string) {
         );
       });
     });
+  } catch (error) {
+    return error;
+  }
+};
+
+export const genExport = function (fsPath: string, name: string) {
+  if (!fsPath.includes("src")) {
+    return;
+  }
+  const targetPath = path.join(fsPath.split("src")[0], "src", "index.ts");
+  try {
+    const data: string = fs.readFileSync(targetPath, "utf-8");
+    if (data && !data.includes(name)) {
+      fs.appendFile(
+        targetPath,
+        `export { default as ${name} } from './components/${name}';`,
+        "utf-8",
+        (err: any) => {
+          console.log(err);
+        }
+      );
+    }
   } catch (error) {
     return error;
   }

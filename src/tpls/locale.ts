@@ -1,3 +1,5 @@
 module.exports = {
-  locale: {},
+  locale: {
+    subtitle: "副标题",
+  },
 };

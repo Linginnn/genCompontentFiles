@@ -8,14 +8,6 @@ import path = require("path");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
-const tpl = (type: string | undefined) => `
-  /**
-   * @required 
-   * @description.zh-CN
-   * @description.en-US
-   * @type
-   */
-  ${type}:`;
 
 export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
@@ -46,6 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
             util.genFiles(path.join(__dirname, "tpls/tpl"), uri.fsPath, msg);
             util.genLocalesDir(uri.fsPath, msg);
+            util.genExport(uri.fsPath, msg);
             setTimeout(() => {
               vscode.window.showInformationMessage(`生成${msg}文件夹成功`);
             }, 10);
