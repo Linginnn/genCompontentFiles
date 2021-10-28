@@ -1,14 +1,6 @@
 import React from "react";
+import { ItplProps } from "./interface";
 
-export interface ItplProps {
-  /**
-   * @required true
-   * @description.en-US
-   * @description.zh-CN
-   * @type  id
-   */
-  id: number;
-}
 const tpl: React.FC<ItplProps> = (props) => {
   /**state**/
 

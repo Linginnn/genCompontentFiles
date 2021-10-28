@@ -1,16 +1,25 @@
-## Bpl  {{tpl.title}}
+---
+title: {{ tpl.title }}
+---
 
-{{tpl.subtitle}}
+## {{ tpl.title}}
 
-{{app.codepre}}:
+{{ tpl.desc}}
 
-```tsx
-import React from 'react';
-import { Bpl } from 'mc-design-pc';
+## {{ Bpl.whenToUse }}
 
-export default () => (
-  <Bpl/>
-);
-```
+{{ tpl.useDetail }}
 
-<API exports='["default"]'/>
+## {{ Bpl.Example }}
+
+<code src="./demo1.tsx" title="{{tpl.title1}}" desc="{{tpl.desc1}}">
+
+## {{ Bpl.propsTable }}
+
+{{ tpl.apiInstruction }}
+
+<API hideTitle src="../interface.tsx"/>
+
+## FAQ
+
+这里是常见问题回答

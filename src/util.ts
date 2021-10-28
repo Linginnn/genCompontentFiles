@@ -1,6 +1,6 @@
-import path = require("path");
-
-const fs = require("fs");
+import * as path from "path";
+import * as fs from "fs";
+import { typeListMap } from "./config";
 const LOCALES = "mdLocales";
 
 export const genFiles = function (
@@ -24,7 +24,7 @@ export const copyFile = function (
   targtName: string,
   endWith: string = "tpl"
 ) {
-  let paths: [] = fs.readdirSync(src); //同步读取当前目录
+  let paths = fs.readdirSync(src); //同步读取当前目录
   paths
     .filter((item: string) => {
       return !item.includes(".js");
@@ -73,18 +73,26 @@ export const copyFile = function (
 export const genLocalesDir = function (fsPath: string, name: string) {
   const lowName = name.toLocaleLowerCase();
   try {
-    const data: string = fs.readFileSync(
-      path.join(__dirname, "/tpls/locale.ts"),
+    const localeList = ["zh-CN", "en-US"];
+    const en: string = fs.readFileSync(
+      path.join(__dirname, "/tpls/locale.en-US.ts"),
       "utf-8"
     );
+    const zh: string = fs.readFileSync(
+      path.join(__dirname, "/tpls/locale.zh-CN.ts"),
+      "utf-8"
+    );
+    const localeDataMap = { "zh-CN": zh, "en-US": en };
     fs.mkdir(path.join(fsPath, "../", LOCALES, lowName), (err: any) => {
       if (err) {
         return err;
       }
-      ["zh-CN", "en-US"].forEach((item) => {
+      localeList.forEach((item) => {
+        // @ts-ignore
+        const data = localeDataMap[item];
         fs.writeFileSync(
           path.join(fsPath, "../", LOCALES, lowName, `${item}.ts`),
-          data.replace("locale", lowName)
+          data.replace("locale", lowName).replace("tpl", name)
         );
       });
     });
@@ -116,6 +124,47 @@ export const genExport = function (fsPath: string, name: string) {
 };
 
 export const getFileRepeat = function (fsPath: string, name: string) {
-  let paths: [] = fs.readdirSync(fsPath); //同步读取当前目录
+  let paths = fs.readdirSync(fsPath); //同步读取当前目录
   return !!paths.find((item) => item === name);
+};
+
+export const appendDocument = function (
+  fsPath: string,
+  name: string,
+  type: keyof typeof typeListMap
+) {
+  if (!fsPath.includes("src")) {
+    return;
+  }
+  const targetPath = path.join(
+    fsPath.split("src")[0],
+    "config/menus",
+    "components.ts"
+  );
+  try {
+    const data: string = fs.readFileSync(targetPath, "utf-8");
+    const finalData = eval(
+      "(" +
+        data.replace("export", "").replace("default", "").replace(";", "") +
+        ")"
+    );
+    const zhTarget = finalData["/components"].find(
+      (item: any) => item.title === type
+    );
+    const enTarget = finalData["/en-US/components"].find(
+      (item: any) => item.title === typeListMap[type]
+    );
+    if (zhTarget && enTarget) {
+      zhTarget.children.push(`components/${name}/docs/index.zh-CN.md`);
+      enTarget.children.push(`components/${name}/docs/index.en-US.md`);
+      const dataString = `export default ${JSON.stringify(
+        finalData,
+        null,
+        2
+      )};`;
+      fs.writeFileSync(targetPath, dataString);
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };

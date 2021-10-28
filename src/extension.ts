@@ -3,11 +3,11 @@
 import * as vscode from "vscode";
 import * as util from "./util";
 import * as comment from "./tpls/comment";
+import * as path from "path";
+import { typeList, typeListMap } from "./config";
 import { Position } from "vscode";
-import path = require("path");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-
 
 export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
@@ -15,50 +15,53 @@ export function activate(context: vscode.ExtensionContext) {
   // The commandId parameter must match the command field in package.json
   const genCompontent = vscode.commands.registerCommand(
     "gen-compontent-file.genCompontent",
-    (uri) => {
-      vscode.window
-        .showInputBox({
-          placeHolder: "请输入组件名", // 在输入框内的提示信息
-          prompt: "输入组件名字，首字母大写", // 在输入框下方的提示信息
-          validateInput: (text) => {
-            if (/^[A-Z][A-z0-9]*$/.test(text)) {
-              return;
-            }
-            if (!text) {
-              return "组件名字为必填";
-            }
-            return "输入组件名字，首字母大写";
-          },
-        })
-        .then((msg) => {
-          const repeat = util.getFileRepeat(uri.fsPath, msg ?? "Compontent");
-          const gen = () => {
-            if (!msg) {
-              return;
-            }
-            util.genFiles(path.join(__dirname, "tpls/tpl"), uri.fsPath, msg);
-            util.genLocalesDir(uri.fsPath, msg);
-            util.genExport(uri.fsPath, msg);
-            setTimeout(() => {
-              vscode.window.showInformationMessage(`生成${msg}文件夹成功`);
-            }, 10);
-          };
-          if (repeat) {
-            vscode.window
-              .showInformationMessage(
-                `${msg}组件已存在,是否继续创建`,
-                { modal: true },
-                "是"
-              )
-              .then((pick) => {
-                if (pick === "是") {
-                  gen();
-                }
-              });
-          } else {
-            gen();
+    async (uri) => {
+      const msg = await vscode.window.showInputBox({
+        placeHolder: "请输入组件名", // 在输入框内的提示信息
+        prompt: "输入组件名字，首字母大写", // 在输入框下方的提示信息
+        validateInput: (text) => {
+          if (/^[A-Z][A-z0-9]*$/.test(text)) {
+            return;
           }
-        });
+          if (!text) {
+            return "组件名字为必填";
+          }
+          return "输入组件名字，首字母大写";
+        },
+      });
+      const repeat = util.getFileRepeat(uri.fsPath, msg ?? "Compontent");
+      const gen = async () => {
+        // @ts-ignore
+        const type: keyof typeof typeListMap =
+          await vscode.window.showQuickPick(typeList, {
+            placeHolder: "请选择组件所属类型",
+          });
+        if (!msg || !type) {
+          return;
+        }
+        util.genFiles(path.join(__dirname, "tpls/tpl"), uri.fsPath, msg);
+        util.genLocalesDir(uri.fsPath, msg);
+        util.genExport(uri.fsPath, msg);
+        util.appendDocument(uri.fsPath, msg, type || "通用");
+        setTimeout(() => {
+          vscode.window.showInformationMessage(`生成${msg}文件夹成功`);
+        }, 100);
+      };
+      if (repeat) {
+        vscode.window
+          .showInformationMessage(
+            `${msg}组件已存在,是否继续创建`,
+            { modal: true },
+            "是"
+          )
+          .then((pick) => {
+            if (pick === "是") {
+              gen();
+            }
+          });
+      } else {
+        gen();
+      }
     }
   );
 
@@ -66,7 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
     "gen-compontent-file.genComment",
     () => {
       //在光标位置插入字符串
-      const msg = vscode.window
+      vscode.window
         .showInputBox({
           placeHolder: "请输入属性", // 在输入框内的提示信息
           prompt: "请输入属性", // 在输入框下方的提示信息
