@@ -42,10 +42,16 @@ export function activate(context: vscode.ExtensionContext) {
         util.genFiles(path.join(__dirname, "tpls/tpl"), uri.fsPath, msg);
         util.genLocalesDir(uri.fsPath, msg);
         util.genExport(uri.fsPath, msg);
-        util.appendDocument(uri.fsPath, msg, type || "通用");
+
         setTimeout(() => {
           vscode.window.showInformationMessage(`生成${msg}文件夹成功`);
         }, 100);
+        let terminal = vscode.window.createTerminal({
+          name: `生成${msg}的MD文件`,
+        });
+        terminal.show(true);
+        terminal.sendText(`yarn md:gen ${msg}`);
+        util.appendDocument(uri.fsPath, msg, type || "通用");
       };
       if (repeat) {
         vscode.window
