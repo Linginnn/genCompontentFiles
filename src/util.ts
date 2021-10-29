@@ -48,17 +48,9 @@ export const copyFile = function (
         if (stats.isFile()) {
           //如果是个文件则拷贝
           const data = fs.readFileSync(_src, "utf-8");
-          let finalData = "";
-          if (itemPath.includes("tpl.md")) {
-            finalData = data
-              .replaceAll(endWith, lowTargtName)
-              .replaceAll("Bpl", targtName);
-          } else {
-            finalData = data.replaceAll(
-              endWith,
-              itemPath.includes(".less") ? lowTargtName : targtName
-            );
-          }
+          let finalData = data
+            .replaceAll(endWith, lowTargtName)
+            .replaceAll("Bpl", targtName);
 
           fs.writeFileSync(_dst, finalData);
         } else if (stats.isDirectory()) {

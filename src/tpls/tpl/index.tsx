@@ -1,7 +1,12 @@
 import React from "react";
-import { ItplProps } from "./interface";
+import { Bpl as AntBpl } from "antd";
+import { IBplProps } from "./interface";
+import classNames from "classnames";
+import getPrefixCls from "../../_utils/getPrefixCls";
+import "./index.less";
 
-const tpl: React.FC<ItplProps> = (props) => {
+const Bpl: React.FC<IBplProps> = (props) => {
+  const { ...restProps } = props;
   /**state**/
 
   /**effect**/
@@ -9,6 +14,13 @@ const tpl: React.FC<ItplProps> = (props) => {
   /**methods**/
 
   /**render**/
-  return <div>tpl</div>;
+
+  const prefixCls = getPrefixCls("tpl");
+  const cls = classNames(prefixCls);
+  return (
+    <div className={cls}>
+      <AntBpl {...restProps} />
+    </div>
+  );
 };
-export default tpl;
+export default Bpl;
