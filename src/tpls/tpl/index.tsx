@@ -2,7 +2,7 @@ import React from "react";
 import { Bpl as AntBpl } from "antd";
 import { IBplProps } from "./interface";
 import classNames from "classnames";
-import getPrefixCls from "../../_utils/getPrefixCls";
+import getPrefixCls from "../../utils/getPrefixCls";
 import "./index.less";
 
 const Bpl: React.FC<IBplProps> = (props) => {

@@ -1,6 +1,6 @@
 module.exports = {
   locale: {
-    title: "title",
+    title: "tpl",
     desc: "desc",
     useDetail: "Working with scen",
     apiInstruction: "API Instruction",

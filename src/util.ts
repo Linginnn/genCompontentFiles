@@ -103,7 +103,9 @@ export const genExport = function (fsPath: string, name: string) {
     if (data && !data.includes(name)) {
       fs.appendFile(
         targetPath,
-        `export { default as ${name} } from './components/${name}';`,
+        `
+        \r\nexport { default as ${name} } from './components/${name}';
+        \r\nexport type { I${name}Props } from './components/${name}/interface';`,
         "utf-8",
         (err: any) => {
           console.log(err);
@@ -147,8 +149,8 @@ export const appendDocument = function (
       (item: any) => item.title === typeListMap[type]
     );
     if (zhTarget && enTarget) {
-      zhTarget.children.push(`components/${name}/docs/index.zh-CN.md`);
-      enTarget.children.push(`components/${name}/docs/index.en-US.md`);
+      zhTarget.children.push(`components/${name}/@docs/index.zh-CN.md`);
+      enTarget.children.push(`components/${name}/@docs/index.en-US.md`);
       const dataString = `export default ${JSON.stringify(
         finalData,
         null,

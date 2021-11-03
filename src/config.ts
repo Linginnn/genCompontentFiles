@@ -18,4 +18,6 @@ const typeList = [
   "其他",
 ];
 
+
+
 export { typeListMap, typeList };

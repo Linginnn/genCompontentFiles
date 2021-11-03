@@ -2,19 +2,19 @@
 title: {{ tpl.title }}
 ---
 
-## {{ tpl.title}}
+## {{ tpl.title }}
 
 {{ tpl.desc}}
 
-## {{ Bpl.whenToUse }}
+## {{ public.whenToUse }}
 
 {{ tpl.useDetail }}
 
-## {{ Bpl.Example }}
+## {{ public.Example }}
 
 <code src="./demo1.tsx" title="{{tpl.title1}}" desc="{{tpl.desc1}}">
 
-## {{ Bpl.propsTable }}
+## {{ public.propsTable }}
 
 {{ tpl.apiInstruction }}
 

@@ -1,6 +1,7 @@
 import React from "react";
+import { BplProps } from "antd";
 
-export interface IBplProps {
+export interface IBplProps extends BplProps {
   /**
    * @required
    * @description.zh-CN
